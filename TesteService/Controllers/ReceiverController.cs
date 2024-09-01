@@ -47,7 +47,7 @@ public class ReceiverController : ControllerBase
     public async Task<ActionResult> AddReceiver([FromBody] Receiver receiver)
     {
         await _repository.AddAsync(receiver);
-        await SendMessageToQueue(receiver);
+        SendMessageToQueue(receiver).GetAwaiter().GetResult();
         return CreatedAtAction(nameof(GetReceiverById), new { id = receiver.Id }, receiver);
     }
 
@@ -85,23 +85,38 @@ public class ReceiverController : ControllerBase
 
     private async Task SendMessageToQueue(Receiver receiver)
     {
+        string ServiceBusConnectionString = Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CS");
+        const string QueueName = "serviceappmessages";
+
         // Create a ServiceBusClient object using the connection string to the namespace.
-        //await using var client = new ServiceBusClient(_configuration["AzureServiceBus:ConnectionString"]);
-        var serviceBusCS = Environment.GetEnvironmentVariable("AZURE_SERVICE_BUS_CS");
-        await using var client = new ServiceBusClient(serviceBusCS);
+        await using var client = new ServiceBusClient(ServiceBusConnectionString);
 
         // Create a ServiceBusSender object by invoking the CreateSender method on the ServiceBusClient object, and specifying the queue name. 
-        ServiceBusSender sender = client.CreateSender("serviceappmessages");
+        ServiceBusSender sender = client.CreateSender(QueueName);
 
-        var receiverMessageDto = _mapper.Map<ReceiverMessageDto>(receiver);
+        try
+        {
+            var receiverMessageDto = _mapper.Map<ReceiverMessageDto>(receiver);
 
-        // Create a new message to send to the queue.
-        string messageJson = JsonConvert.SerializeObject(receiverMessageDto);
-        var message = new ServiceBusMessage(messageJson);
+            // Create a new message to send to the queue.
+            string messageJson = JsonConvert.SerializeObject(receiverMessageDto);
+            var message = new ServiceBusMessage(messageJson);
 
-        // Send the message to the queue.
-        await sender.SendMessageAsync(message);
+            // Send the message to the queue.
+            await sender.SendMessageAsync(message);
 
-        Console.WriteLine(message);
+            Console.WriteLine(message);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+        }
+        finally
+        {
+            // Calling DisposeAsync on client types is required to ensure that network
+            // resources and other unmanaged objects are properly cleaned up.
+            await sender.DisposeAsync();
+            await client.DisposeAsync();
+        }
     }
 }

@@ -1,7 +1,5 @@
-﻿namespace ReceiverService.Models.Dtos
+﻿namespace ReceiverService.Models.Dtos;
+public class LoginDto
 {
-    public class LoginDto
-    {
-        public String usuario {  get; set; }
-    }
+    public String usuario {  get; set; }
 }
