@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.Cosmos;
 using Microsoft.IdentityModel.Tokens;
+using ReceiverService.Filters;
 using ReceiverService.Models;
 using ReceiverService.Repositories;
 using System.Text;
