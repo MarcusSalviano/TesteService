@@ -2,7 +2,7 @@
 
 namespace ReceiverService.Models.Dtos;
 
-internal class ReceiverMessageDto
+public class ReceiverMessageDto
 {
     public string Id { get; set; }
     public string Field1 { get; set; }

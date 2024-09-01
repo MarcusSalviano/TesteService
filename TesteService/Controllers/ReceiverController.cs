@@ -47,7 +47,7 @@ public class ReceiverController : ControllerBase
     public async Task<ActionResult> AddReceiver([FromBody] Receiver receiver)
     {
         await _repository.AddAsync(receiver);
-        SendMessageToQueue(receiver).GetAwaiter().GetResult();
+        await SendMessageToQueue(receiver);
         return CreatedAtAction(nameof(GetReceiverById), new { id = receiver.Id }, receiver);
     }
 

@@ -1,11 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using ReceiverService.Models.Dtos;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Newtonsoft.Json;
 
 namespace ConsumerService.Controllers;
 
@@ -21,9 +17,9 @@ public class ConsumerController : ControllerBase
     }
 
     [HttpPost]
-    public async void ProcessQueue()
+    public async Task ProcessQueue()
     {        
-        ReceiveMessageAsync().GetAwaiter().GetResult();
+        await ReceiveMessageAsync();
     }
 
     static async Task ReceiveMessageAsync()
@@ -46,6 +42,7 @@ public class ConsumerController : ControllerBase
 
 
         await processor.StartProcessingAsync();
+        await Task.Delay(TimeSpan.FromSeconds(10));
         await processor.CloseAsync();
 
     }
@@ -54,16 +51,24 @@ public class ConsumerController : ControllerBase
     static async Task MessageHandler(ProcessMessageEventArgs args)
     {
         string body = args.Message.Body.ToString();
+        ReceiverMessageDto receiverMessageDto = JsonConvert.DeserializeObject<ReceiverMessageDto>(body);
+        ProcessDto(receiverMessageDto);
         Console.WriteLine($"Received: {body}");
 
         // complete the message. messages is deleted from the queue. 
         await args.CompleteMessageAsync(args.Message);
     }
-
+    
     // handle any errors when receiving messages
     static Task ErrorHandler(ProcessErrorEventArgs args)
     {
         Console.WriteLine(args.Exception.ToString());
         return Task.CompletedTask;
+    }
+
+    private static void ProcessDto(ReceiverMessageDto? receiverMessageDto)
+    {
+        //ToDo
+        //Processar a mensagem recebida do Service Bus
     }
 }
