@@ -17,14 +17,12 @@ namespace ReceiverService.Controllers;
 public class ReceiverController : ControllerBase
 {
     private readonly IRepository<Receiver> _repository;
-    private readonly IMapper _mapper;
-    private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;    
 
-    public ReceiverController(IRepository<Receiver> repository, IMapper mapper, IConfiguration configuration)
+    public ReceiverController(IRepository<Receiver> repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
-        _configuration = configuration;
     }
 
     [HttpGet("{id}")]
