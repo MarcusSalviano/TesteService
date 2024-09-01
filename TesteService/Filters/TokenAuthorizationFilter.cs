@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+namespace ReceiverService.Filters;
+
 public class TokenAuthorizationFilter : IAuthorizationFilter
 {
     //private readonly string _validToken;

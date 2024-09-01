@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System.Diagnostics;
 
+namespace ReceiverService.Filters;
+
 public class ExecutionTimeActionFilter : IActionFilter
 {
     private Stopwatch _stopwatch;
