@@ -55,7 +55,7 @@ public class ReceiverController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDto loginDto)
     {
-        if (loginDto.usuario is null or not "root")
+        if (loginDto.Usuario is null or not "root")
             return Unauthorized(new { message = "Credenciais inválidas." });
 
         // Gerar o token JWT
@@ -65,7 +65,7 @@ public class ReceiverController : ControllerBase
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Name, loginDto.usuario.ToString())
+                new Claim(ClaimTypes.Name, loginDto.Usuario.ToString())
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
